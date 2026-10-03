@@ -1,5 +1,18 @@
+import mongoose from 'mongoose';
 import Project from '../models/Project.js';
 import Task from '../models/Task.js';
+
+const createError = (message, status) => {
+    const err = new Error(message);
+    err.status = status;
+    return err;
+};
+
+const validateProjectId = (id) => {
+    if (!mongoose.isValidObjectId(id)) {
+        throw createError('Invalid project ID', 400);
+    }
+};
 
 export const createProject = async (data, userId) => {
     return await Project.create({
@@ -34,4 +47,38 @@ export const getProjectsWithTasks = async (userId) => {
         ...project.toObject({ virtuals: true }),
         tasks: tasksByProject.get(project._id.toString()) ?? [],
     }));
+};
+
+export const updateProject = async (id, data, userId) => {
+    validateProjectId(id);
+
+    const project = await Project.findOneAndUpdate(
+        { _id: id, createdBy: userId },
+        { $set: data },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    if (!project) {
+        throw createError('Project not found', 404);
+    }
+
+    return project;
+};
+
+export const deleteProject = async (id, userId) => {
+    validateProjectId(id);
+
+    const project = await Project.findOneAndDelete({
+        _id: id,
+        createdBy: userId,
+    });
+
+    if (!project) {
+        throw createError('Project not found', 404);
+    }
+
+    return project;
 };
