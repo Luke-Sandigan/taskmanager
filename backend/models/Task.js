@@ -14,6 +14,11 @@ const taskSchema = new mongoose.Schema(
             default: '',
             maxlength: 5000,
         },
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Project',
+            index: true,
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

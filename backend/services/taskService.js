@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Task from '../models/Task.js';
+import Project from '../models/Project.js';
 
 
 //task service#3 updates ids
@@ -16,9 +17,21 @@ const validateTaskId = (id) => {
 };
 
 export const createTask = async (data, userId) => {
+    if (data.projectId) {
+        const project = await Project.findOne({
+            _id: data.projectId,
+            createdBy: userId,
+        });
+
+        if (!project) {
+            throw createError('Project not found', 404);
+        }
+    }
+
     return await Task.create({
         title: data.title,
         description: data.description ?? '',
+        projectId: data.projectId,
         createdBy: userId,
     });
 };
