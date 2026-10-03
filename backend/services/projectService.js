@@ -14,12 +14,26 @@ const validateProjectId = (id) => {
     }
 };
 
+const projectWithTasks = async (project, userId) => {
+    const tasks = await Task.find({
+        createdBy: userId,
+        projectId: project._id,
+    }).sort({ createdAt: -1 });
+
+    return {
+        ...project.toObject({ virtuals: true }),
+        tasks,
+    };
+};
+
 export const createProject = async (data, userId) => {
-    return await Project.create({
+    const project = await Project.create({
         name: data.name,
         description: data.description ?? '',
         createdBy: userId,
     });
+
+    return projectWithTasks(project, userId);
 };
 
 export const getProjectsWithTasks = async (userId) => {
@@ -65,7 +79,7 @@ export const updateProject = async (id, data, userId) => {
         throw createError('Project not found', 404);
     }
 
-    return project;
+    return projectWithTasks(project, userId);
 };
 
 export const deleteProject = async (id, userId) => {
@@ -80,5 +94,5 @@ export const deleteProject = async (id, userId) => {
         throw createError('Project not found', 404);
     }
 
-    return project;
+    return projectWithTasks(project, userId);
 };
