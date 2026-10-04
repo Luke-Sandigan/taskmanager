@@ -2,6 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import Task from "../pages/Task";
 
 
 function AppRoutes() {
@@ -9,7 +10,7 @@ function AppRoutes() {
     <Routes>
         <Route path="/" element={<Register/>} />
         <Route path="/login" element={<Login/>} />
-     
+        <Route path="tasks" element={<Task />} />
     </Routes>
     
   )
