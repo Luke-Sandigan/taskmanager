@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FormInput from "../components/common/FormInput";
 import Button from "../components/common/Button";
-// import { authApi } from "../services/api";
+import { authApi } from "../services/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ function Register() {
 
     try {
       setLoading(true);
-    //   await authApi.register(form);
+      await authApi.register(form);
       navigate("/");
     } catch (error) {
       setServerError(error.message);

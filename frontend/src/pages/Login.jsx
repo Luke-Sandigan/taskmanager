@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FormInput from "../components/common/FormInput";
 import Button from "../components/common/Button";
-// import { authApi } from "../services/api";
+import { authApi } from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -28,9 +28,9 @@ function Login() {
 
     try {
       setLoading(true);
-      // const result = await authApi.login(form);
-      // const token = result.token || result.data?.token;
-      // if (token) localStorage.setItem("token", token);
+      const result = await authApi.login(form);
+      const token = result.token || result.data?.token;
+      if (token) localStorage.setItem("token", token);
       navigate("/tasks");
     } catch (error) {
       setServerError(error.message);
