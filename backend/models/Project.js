@@ -1,23 +1,16 @@
 import mongoose from 'mongoose';
 
-const taskSchema = new mongoose.Schema(
+const projectSchema = new mongoose.Schema(
     {
-        title: {
+        name: {
             type: String,
             required: true,
             trim: true,
-            maxlength: 200,
         },
         description: {
             type: String,
             trim: true,
             default: '',
-            maxlength: 5000,
-        },
-        projectId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Project',
-            index: true,
         },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
@@ -31,5 +24,4 @@ const taskSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model('Task', taskSchema); 
-//current server.js does not show authentication middleware (For some reason, please check luke)
+export default mongoose.model('Project', projectSchema);
