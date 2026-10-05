@@ -5,6 +5,19 @@ function Project() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
 
+  const projects = [
+  {
+    id: 1,
+    name: "School Project",
+    tasks: ["Finish research", "Prepare presentation"],
+  },
+  {
+    id: 2,
+    name: "Personal Tasks",
+    tasks: ["Buy groceries", "Clean room"],
+  },
+];
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
   <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
@@ -47,6 +60,24 @@ function Project() {
              Create Project
         </button>
         </form>
+
+        <div className="mt-8">
+  <h2 className="mb-4 text-xl font-bold text-slate-900">Projects</h2>
+  {projects.map((project) => (
+  <div
+    key={project.id}
+    className="mb-4 rounded-lg border border-slate-200 p-4"
+  >
+    <h3 className="font-semibold text-slate-900">{project.name}</h3>
+
+    <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
+  {project.tasks.map((task, index) => (
+    <li key={index}>{task}</li>
+  ))}
+</ul>
+  </div>
+))}
+</div>
       </div>
     </div>
   );
