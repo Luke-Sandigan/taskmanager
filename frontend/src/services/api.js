@@ -62,3 +62,14 @@ export const taskApi = {
       method: "DELETE",
     }),
 };
+
+export const projectApi = {
+  list: () =>
+    request("/projects"),
+
+  create: (project) =>
+    request("/projects", {
+      method: "POST",
+      body: JSON.stringify(project),
+    }),
+};

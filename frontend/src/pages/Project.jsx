@@ -1,29 +1,48 @@
 import "../index.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { projectApi } from "../services/api";
 
 function Project() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
+  const [projects, setProjects] = useState([]);
 
-  const projects = [
-  {
-    id: 1,
-    name: "School Project",
-    tasks: ["Finish research", "Prepare presentation"],
-  },
-  {
-    id: 2,
-    name: "Personal Tasks",
-    tasks: ["Buy groceries", "Clean room"],
-  },
-];
+  useEffect(() => {
+  async function loadProjects() {
+    try {
+      const response = await projectApi.list();
+      setProjects(response.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadProjects();
+}, []);
+
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  try {
+    const response = await projectApi.create({
+      name: projectName,
+      description: description,
+    });
+
+    setProjects([...projects, response.data]);
+    setProjectName("");
+    setDescription("");
+  } catch (error) {
+    console.error(error);
+  }
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
   <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
         <h1 className="text-2xl font-bold text-slate-900">Create Project</h1>
 
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={handleSubmit}>
           <div>
             <label className="text-sm font-medium text-slate-700">Project Name</label>
             <br />
