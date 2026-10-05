@@ -7,14 +7,21 @@ function Project() {
   const [description, setDescription] = useState("");
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadProjects() {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await projectApi.list();
         setProjects(response.data || []);
       } catch (error) {
-        console.error(error);
+        setError(error.message || "Failed to load projects.");
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -28,7 +35,15 @@ function Project() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    if (!projectName.trim()) {
+      setError("Project name is required.");
+      return;
+    }
+
     try {
+      setLoading(true);
+      setError("");
+
       const response = await projectApi.create({
         name: projectName,
         description: description,
@@ -38,21 +53,30 @@ function Project() {
       setProjectName("");
       setDescription("");
     } catch (error) {
-      console.error(error);
+      setError(error.message || "Failed to create project.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-slate-900">Create Project</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          Create Project
+        </h1>
 
-        <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-4">
           <div>
             <label className="text-sm font-medium text-slate-700">
               Project Name
             </label>
-            <br />
 
             <input
               type="text"
@@ -63,13 +87,10 @@ function Project() {
             />
           </div>
 
-          <br />
-
-          <div>
+          <div className="mt-4">
             <label className="text-sm font-medium text-slate-700">
               Description
             </label>
-            <br />
 
             <textarea
               placeholder="Enter project description"
@@ -79,13 +100,12 @@ function Project() {
             />
           </div>
 
-          <br />
-
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+            disabled={loading}
+            className="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Create Project
+            {loading ? "Please wait..." : "Create Project"}
           </button>
         </form>
 
@@ -102,6 +122,18 @@ function Project() {
             className="mb-4 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
           />
 
+          {loading && projects.length === 0 && (
+            <p className="text-sm text-slate-500">
+              Loading projects...
+            </p>
+          )}
+
+          {!loading && filteredProjects.length === 0 && (
+            <p className="text-sm text-slate-500">
+              No projects found.
+            </p>
+          )}
+
           {filteredProjects.map((project) => (
             <div
               key={project._id || project.id}
@@ -111,11 +143,19 @@ function Project() {
                 {project.name}
               </h3>
 
+              {project.description && (
+                <p className="mt-1 text-sm text-slate-500">
+                  {project.description}
+                </p>
+              )}
+
               {project.tasks && (
                 <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
                   {project.tasks.map((task, index) => (
-                    <li key={index}>
-                      {typeof task === "string" ? task : task.title || task.name}
+                    <li key={task._id || index}>
+                      {typeof task === "string"
+                        ? task
+                        : task.title || task.name}
                     </li>
                   ))}
                 </ul>
