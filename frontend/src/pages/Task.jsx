@@ -7,6 +7,7 @@ import { taskApi } from "../services/api";
 
 function Task() {
   const navigate = useNavigate();
+
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,8 +18,15 @@ function Task() {
     try {
       setLoading(true);
       setError("");
+
       const result = await taskApi.list();
-      setTasks(result.tasks || result.data?.tasks || result.data || []);
+
+      setTasks(
+        result.tasks ||
+          result.data?.tasks ||
+          result.data ||
+          []
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -31,6 +39,7 @@ function Task() {
       navigate("/");
       return;
     }
+
     loadTasks();
   }, []);
 
@@ -38,15 +47,39 @@ function Task() {
     try {
       setSaving(true);
       setError("");
+
       if (editingTask) {
-        const result = await taskApi.update(editingTask.id, data);
-        const updated = result.task || result.data?.task || result.data;
-        setTasks(tasks.map((task) => task.id === editingTask.id ? updated : task));
+        const result = await taskApi.update(
+          editingTask._id,
+          data
+        );
+
+        const updated =
+          result.task ||
+          result.data?.task ||
+          result.data;
+
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === editingTask._id
+              ? updated
+              : task
+          )
+        );
+
         setEditingTask(null);
       } else {
         const result = await taskApi.create(data);
-        const created = result.task || result.data?.task || result.data;
-        setTasks([...tasks, created]);
+
+        const created =
+          result.task ||
+          result.data?.task ||
+          result.data;
+
+        setTasks((prevTasks) => [
+          ...prevTasks,
+          created,
+        ]);
       }
     } catch (err) {
       setError(err.message);
@@ -56,12 +89,18 @@ function Task() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Delete this task?")) return;
+    if (!window.confirm("Delete this task?")) {
+      return;
+    }
 
     try {
       setError("");
+
       await taskApi.remove(id);
-      setTasks(tasks.filter((task) => task.id !== id));
+
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => task._id !== id)
+      );
     } catch (err) {
       setError(err.message);
     }
@@ -76,8 +115,16 @@ function Task() {
     <div className="min-h-screen bg-slate-100">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <h1 className="text-xl font-bold">Task Manager</h1>
-          <Button variant="secondary" onClick={logout}>Logout</Button>
+          <h1 className="text-xl font-bold">
+            Task Manager
+          </h1>
+
+          <Button
+            variant="secondary"
+            onClick={logout}
+          >
+            Logout
+          </Button>
         </div>
       </header>
 
@@ -90,9 +137,22 @@ function Task() {
         />
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">Your Tasks</h2>
-          {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-          <TaskList tasks={tasks} loading={loading} onEdit={setEditingTask} onDelete={handleDelete} />
+          <h2 className="mb-4 text-xl font-semibold">
+            Your Tasks
+          </h2>
+
+          {error && (
+            <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+
+          <TaskList
+            tasks={tasks}
+            loading={loading}
+            onEdit={setEditingTask}
+            onDelete={handleDelete}
+          />
         </section>
       </main>
     </div>
