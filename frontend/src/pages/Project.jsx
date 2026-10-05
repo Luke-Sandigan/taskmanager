@@ -60,108 +60,115 @@ function Project() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-slate-900">
-          Create Project
-        </h1>
+    <div className="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white p-4 shadow-lg sm:p-6">
+            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Create Project
+            </h1>
 
-        {error && (
-          <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-            {error}
+            {error && (
+              <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Project Name
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Enter project name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="mt-4">
+                <label className="text-sm font-medium text-slate-700">
+                  Description
+                </label>
+
+                <textarea
+                  placeholder="Enter project description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows="5"
+                  className="mt-1 w-full resize-none rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                {loading ? "Please wait..." : "Create Project"}
+              </button>
+            </form>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div>
-            <label className="text-sm font-medium text-slate-700">
-              Project Name
-            </label>
+          <div className="rounded-2xl bg-white p-4 shadow-lg sm:p-6">
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
+              Projects
+            </h2>
 
             <input
               type="text"
-              placeholder="Enter project name"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+              placeholder="Search projects..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
             />
-          </div>
 
-          <div className="mt-4">
-            <label className="text-sm font-medium text-slate-700">
-              Description
-            </label>
-
-            <textarea
-              placeholder="Enter project description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Please wait..." : "Create Project"}
-          </button>
-        </form>
-
-        <div className="mt-8">
-          <h2 className="mb-4 text-xl font-bold text-slate-900">
-            Projects
-          </h2>
-
-          <input
-            type="text"
-            placeholder="Search projects..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mb-4 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-          />
-
-          {loading && projects.length === 0 && (
-            <p className="text-sm text-slate-500">
-              Loading projects...
-            </p>
-          )}
-
-          {!loading && filteredProjects.length === 0 && (
-            <p className="text-sm text-slate-500">
-              No projects found.
-            </p>
-          )}
-
-          {filteredProjects.map((project) => (
-            <div
-              key={project._id || project.id}
-              className="mb-4 rounded-lg border border-slate-200 p-4"
-            >
-              <h3 className="font-semibold text-slate-900">
-                {project.name}
-              </h3>
-
-              {project.description && (
-                <p className="mt-1 text-sm text-slate-500">
-                  {project.description}
+            <div className="mt-4">
+              {loading && projects.length === 0 && (
+                <p className="text-sm text-slate-500">
+                  Loading projects...
                 </p>
               )}
 
-              {project.tasks && (
-                <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
-                  {project.tasks.map((task, index) => (
-                    <li key={task._id || index}>
-                      {typeof task === "string"
-                        ? task
-                        : task.title || task.name}
-                    </li>
-                  ))}
-                </ul>
+              {!loading && filteredProjects.length === 0 && (
+                <p className="text-sm text-slate-500">
+                  No projects found.
+                </p>
               )}
+
+              {filteredProjects.map((project) => (
+                <div
+                  key={project._id || project.id}
+                  className="mb-4 rounded-lg border border-slate-200 p-4"
+                >
+                  <h3 className="break-words font-semibold text-slate-900">
+                    {project.name}
+                  </h3>
+
+                  {project.description && (
+                    <p className="mt-1 break-words text-sm text-slate-500">
+                      {project.description}
+                    </p>
+                  )}
+
+                  {project.tasks && project.tasks.length > 0 && (
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                      {project.tasks.map((task, index) => (
+                        <li key={task._id || index} className="break-words">
+                          {typeof task === "string"
+                            ? task
+                            : task.title || task.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
