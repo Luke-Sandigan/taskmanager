@@ -33,3 +33,25 @@ export const authApi = {
       body: JSON.stringify(credentials),
     }),
 };
+
+export const taskApi = {
+  list: () =>
+    request("/tasks"),
+
+  create: (task) =>
+    request("/tasks", {
+      method: "POST",
+      body: JSON.stringify(task),
+    }),
+
+  update: (id, task) =>
+    request(`/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(task),
+    }),
+
+  remove: (id) =>
+    request(`/tasks/${id}`, {
+      method: "DELETE",
+    }),
+};
