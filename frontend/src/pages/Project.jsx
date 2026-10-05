@@ -6,45 +6,52 @@ function Project() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [projects, setProjects] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-  async function loadProjects() {
+    async function loadProjects() {
+      try {
+        const response = await projectApi.list();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadProjects();
+  }, []);
+
+  const filteredProjects = projects.filter((project) =>
+    project.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
     try {
-      const response = await projectApi.list();
-      setProjects(response.data || []);
+      const response = await projectApi.create({
+        name: projectName,
+        description: description,
+      });
+
+      setProjects([...projects, response.data]);
+      setProjectName("");
+      setDescription("");
     } catch (error) {
       console.error(error);
     }
   }
 
-  loadProjects();
-}, []);
-
-async function handleSubmit(e) {
-  e.preventDefault();
-
-  try {
-    const response = await projectApi.create({
-      name: projectName,
-      description: description,
-    });
-
-    setProjects([...projects, response.data]);
-    setProjectName("");
-    setDescription("");
-  } catch (error) {
-    console.error(error);
-  }
-}
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
-  <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
         <h1 className="text-2xl font-bold text-slate-900">Create Project</h1>
 
         <form onSubmit={handleSubmit}>
           <div>
-            <label className="text-sm font-medium text-slate-700">Project Name</label>
+            <label className="text-sm font-medium text-slate-700">
+              Project Name
+            </label>
             <br />
 
             <input
@@ -59,7 +66,9 @@ async function handleSubmit(e) {
           <br />
 
           <div>
-            <label className="text-sm font-medium text-slate-700">Description</label>
+            <label className="text-sm font-medium text-slate-700">
+              Description
+            </label>
             <br />
 
             <textarea
@@ -76,27 +85,44 @@ async function handleSubmit(e) {
             type="submit"
             className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
           >
-             Create Project
-        </button>
+            Create Project
+          </button>
         </form>
 
         <div className="mt-8">
-  <h2 className="mb-4 text-xl font-bold text-slate-900">Projects</h2>
-  {projects.map((project) => (
-  <div
-    key={project.id}
-    className="mb-4 rounded-lg border border-slate-200 p-4"
-  >
-    <h3 className="font-semibold text-slate-900">{project.name}</h3>
+          <h2 className="mb-4 text-xl font-bold text-slate-900">
+            Projects
+          </h2>
 
-    <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
-  {project.tasks.map((task, index) => (
-    <li key={index}>{task}</li>
-  ))}
-</ul>
-  </div>
-))}
-</div>
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="mb-4 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+          />
+
+          {filteredProjects.map((project) => (
+            <div
+              key={project._id || project.id}
+              className="mb-4 rounded-lg border border-slate-200 p-4"
+            >
+              <h3 className="font-semibold text-slate-900">
+                {project.name}
+              </h3>
+
+              {project.tasks && (
+                <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
+                  {project.tasks.map((task, index) => (
+                    <li key={index}>
+                      {typeof task === "string" ? task : task.title || task.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
